@@ -22,10 +22,16 @@ void preencherMatriz(Matriz<N> &m){
     }
 }
 
-// template<usize N>
-// Matriz<N> matMulti(Matriz<N> k, int i){
+template<usize N>
+Matriz<N> matMultiThr(Matriz<N> *a, Matriz<N> *b){
+    std::vector<std::thread> threads;
 
-// }
+    
+    
+    for(int i = 0; i < N; i += 1){
+        threads.push_back(std::thread(/* arggs da thread */));
+    }
+}
 
 int main(){
 
@@ -52,23 +58,24 @@ int main(){
         *elapsedSecondsPos = chrono::duration_cast<chrono::nanoseconds>(endPos - startPos);
     });
 
-    auto t2 = std::thread([&](){
+    // auto t2 = std::thread([&](){
         const auto startMat{std::chrono::steady_clock::now()};
         *multiMat = multilpicaMatrizMatricial(*a, *b);
         const auto endMat{std::chrono::steady_clock::now()};
         *elapsedSecondsMat = chrono::duration_cast<chrono::nanoseconds>(endMat - startMat);
-    });
+    // });
 
     t1.join();
-    t2.join();
+    // t2.join();
+    
 
 
 
     std::cout << "Posicional Sigle\n";
-    // imprimeMatriz(*multiPos);
+    imprimeMatriz(*multiPos);
     std::cout << elapsedSecondsPos->count() << "\n";
     std::cout << "Matricial Sigle\n";
-    // imprimeMatriz(*multiMat);
+    imprimeMatriz(*multiMat);
     std::cout << elapsedSecondsMat->count() << "\n";
 
     delete a;

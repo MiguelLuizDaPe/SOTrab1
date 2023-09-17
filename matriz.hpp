@@ -50,9 +50,9 @@ template<usize N>
 void imprimeMatriz(Matriz<N> const& ma){
     for(usize li = 0; li < N; li++){
         for(usize col = 0; col < N; col++){
-            std::cout << ma.at(li, col) << " ";
+            std::cerr << ma.at(li, col) << " ";
         }
-        std::cout << "\n";
+        std::cerr << "\n";
     }
 }
 
