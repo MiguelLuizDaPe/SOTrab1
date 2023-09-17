@@ -78,13 +78,9 @@ int main() {
   // botado no heap
   auto a = std::make_unique<Matriz<M>>();
   auto b = std::make_unique<Matriz<M>>();
-  // auto c = std::make_unique<Matriz<M>>();
-  // auto d = std::make_unique<Matriz<M>>();
 
   preencherMatriz(*a);
   preencherMatriz(*b);
-  // preencherMatriz(*c);
-  // preencherMatriz(*d);
 
   auto multiPosSingle = std::make_unique<Matriz<M>>();
   auto multiPosMulti = std::make_unique<Matriz<M>>(); // se mata no final do escopo
