@@ -4,7 +4,6 @@
 #include <iostream>
 #include <memory>
 #include <thread>
-// #include <type_traits>
 
 #include "types.hpp"
 
@@ -34,10 +33,10 @@ template <usize N> void bubbleSortSigle(usize *a) {
 
 template <usize N> void bubbleSortMulti(usize *buf) {
 
-  usize terco1 = N / 3;
-  usize terco2 = terco1 * 2;
+  usize terco1 = N / 3;//define onde acaba o primeiro terço
+  usize terco2 = terco1 * 2;//define onde acaba o segundo terço
 
-  auto p1 = std::thread([=]() {
+  auto p1 = std::thread([=]() {//thread do primeiro terço
     for (usize base = 0; base < terco1; base++) {
       for (usize bubble = 0; bubble < terco1 - base - 1; bubble++) {
         if (buf[bubble] > buf[bubble + 1]) {
@@ -47,7 +46,7 @@ template <usize N> void bubbleSortMulti(usize *buf) {
     }
   });
 
-  auto p2 = std::thread([=]() {
+  auto p2 = std::thread([=]() {//thread do segundo terço
     for (usize base = terco1; base < terco2; base++) {
       for (usize bubble = terco1; bubble < terco2 - base - 1; bubble++) {
         if (buf[bubble] > buf[bubble + 1]) {
@@ -57,7 +56,7 @@ template <usize N> void bubbleSortMulti(usize *buf) {
     }
   });
 
-  for (usize base = terco2; base < N; base++) {
+  for (usize base = terco2; base < N; base++) {//thread do último terço(terceiro)
     for (usize bubble = terco2; bubble < N - base - 1; bubble++) {
       if (buf[bubble] > buf[bubble + 1]) {
         std::swap(buf[bubble], buf[bubble + 1]);
@@ -65,10 +64,10 @@ template <usize N> void bubbleSortMulti(usize *buf) {
     }
   }
 
-  p1.join();
+  p1.join();//espera as thread terminar
   p2.join();
 
-  for (usize base = 0; base < N; base++) {
+  for (usize base = 0; base < N; base++) {//ordena todos os terços, mas como é bubble não tem muito ganho disso
     for (usize bubble = 0; bubble < N - base - 1; bubble++) {
       if (buf[bubble] > buf[bubble + 1]) {
         std::swap(buf[bubble], buf[bubble + 1]);
@@ -78,7 +77,7 @@ template <usize N> void bubbleSortMulti(usize *buf) {
 }
 
 int main(int argc, char **argv) {
-  if (argc < 2)
+  if (argc < 2)//bagulhinho pra testar single ou multi thread um por cada rodada
     return 1;
   char mode = argv[1][0];
 
@@ -89,11 +88,8 @@ int main(int argc, char **argv) {
   preencherArray<M>(a.get());
   preencherArray<M>(b.get());
 
-  // imprimirArray(*a);
+  auto elapsedSeconds = std::make_unique<chrono::nanoseconds>();//cria só um pq só sentra no if ou no else if
 
-  auto elapsedSeconds = std::make_unique<chrono::nanoseconds>();
-
-  // auto t1 = std::thread([&]() {
   if (mode == 's') {
     const auto start{chrono::steady_clock::now()};
     bubbleSortSigle<M>(a.get());
@@ -111,8 +107,4 @@ int main(int argc, char **argv) {
     // imprimirArray(*b);
     std::cout << elapsedSeconds->count() << "\n";
   }
-
-  // });
-
-  // t1.join();
 }
