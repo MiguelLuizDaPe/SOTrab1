@@ -10,19 +10,19 @@
 
 namespace chrono = std::chrono;
 
-template <usize N> void preencherArray(std::array<usize, N> &a) {
+template <usize N> void preencherArray(usize *a) {
   for (usize i = 0; i < N; i++) {
     a[i] = N - i;
   }
 }
 
-template <usize N> void imprimirArray(std::array<usize, N> &a) {
+template <usize N> void imprimirArray(usize *a) {
   for (usize i = 0; i < N; i++) {
     std::cout << a[i] << "\n";
   }
 }
 
-template <usize N> void bubbleSortSigle(std::array<usize, N> &a) {
+template <usize N> void bubbleSortSigle(usize *a) {
   for (usize base = 0; base < N; base++) {
     for (usize bubble = 0; bubble < N - base - 1; bubble++) {
       if (a[bubble] > a[bubble + 1]) {
@@ -32,26 +32,26 @@ template <usize N> void bubbleSortSigle(std::array<usize, N> &a) {
   }
 }
 
-template <usize N> void bubbleSortMulti(std::array<usize, N> &a) {
+template <usize N> void bubbleSortMulti(usize *buf) {
 
   usize terco1 = N / 3;
   usize terco2 = terco1 * 2;
 
-  auto p1 = std::thread([&]() {
+  auto p1 = std::thread([=]() {
     for (usize base = 0; base < terco1; base++) {
       for (usize bubble = 0; bubble < terco1 - base - 1; bubble++) {
-        if (a[bubble] > a[bubble + 1]) {
-          std::swap(a[bubble], a[bubble + 1]);
+        if (buf[bubble] > buf[bubble + 1]) {
+          std::swap(buf[bubble], buf[bubble + 1]);
         }
       }
     }
   });
 
-  auto p2 = std::thread([&]() {
+  auto p2 = std::thread([=]() {
     for (usize base = terco1; base < terco2; base++) {
       for (usize bubble = terco1; bubble < terco2 - base - 1; bubble++) {
-        if (a[bubble] > a[bubble + 1]) {
-          std::swap(a[bubble], a[bubble + 1]);
+        if (buf[bubble] > buf[bubble + 1]) {
+          std::swap(buf[bubble], buf[bubble + 1]);
         }
       }
     }
@@ -59,8 +59,8 @@ template <usize N> void bubbleSortMulti(std::array<usize, N> &a) {
 
   for (usize base = terco2; base < N; base++) {
     for (usize bubble = terco2; bubble < N - base - 1; bubble++) {
-      if (a[bubble] > a[bubble + 1]) {
-        std::swap(a[bubble], a[bubble + 1]);
+      if (buf[bubble] > buf[bubble + 1]) {
+        std::swap(buf[bubble], buf[bubble + 1]);
       }
     }
   }
@@ -70,46 +70,49 @@ template <usize N> void bubbleSortMulti(std::array<usize, N> &a) {
 
   for (usize base = 0; base < N; base++) {
     for (usize bubble = 0; bubble < N - base - 1; bubble++) {
-      if (a[bubble] > a[bubble + 1]) {
-        std::swap(a[bubble], a[bubble + 1]);
+      if (buf[bubble] > buf[bubble + 1]) {
+        std::swap(buf[bubble], buf[bubble + 1]);
       }
     }
   }
 }
 
-int main() {
-  constexpr usize M = 300;
-  auto a = std::make_unique<std::array<usize, M>>();
-  auto b = std::make_unique<std::array<usize, M>>();
+int main(int argc, char **argv) {
+  if (argc < 2)
+    return 1;
+  char mode = argv[1][0];
 
-  preencherArray(*a);
-  preencherArray(*b);
+  constexpr usize M = 3000;
+  auto a = std::unique_ptr<usize[]>(new usize[M]);
+  auto b = std::unique_ptr<usize[]>(new usize[M]);
+
+  preencherArray<M>(a.get());
+  preencherArray<M>(b.get());
 
   // imprimirArray(*a);
 
-  auto elapsedSecondsBubbleSingle = std::make_unique<chrono::nanoseconds>();
-  auto elapsedSecondsBubbleMulti = std::make_unique<chrono::nanoseconds>();
+  auto elapsedSeconds = std::make_unique<chrono::nanoseconds>();
 
-  auto t1 = std::thread([&]() {
-    const auto startBubbleSingle{chrono::steady_clock::now()};
-    bubbleSortSigle(*a);
-    const auto endBubbleSingle{chrono::steady_clock::now()};
-    *elapsedSecondsBubbleSingle = chrono::duration_cast<chrono::nanoseconds>(
-        endBubbleSingle - startBubbleSingle);
-  });
+  // auto t1 = std::thread([&]() {
+  if (mode == 's') {
+    const auto start{chrono::steady_clock::now()};
+    bubbleSortSigle<M>(a.get());
+    const auto end{chrono::steady_clock::now()};
+    *elapsedSeconds = chrono::duration_cast<chrono::nanoseconds>(end - start);
+    std::cout << "Bubble Single\n";
+    // imprimirArray(*a);
+    std::cout << elapsedSeconds->count() << "\n";
+  } else if (mode == 'm') {
+    const auto start{chrono::steady_clock::now()};
+    bubbleSortMulti<M>(b.get());
+    const auto end{chrono::steady_clock::now()};
+    *elapsedSeconds = chrono::duration_cast<chrono::nanoseconds>(end - start);
+    std::cout << "Bubble Multi\n";
+    // imprimirArray(*b);
+    std::cout << elapsedSeconds->count() << "\n";
+  }
 
-  const auto startBubbleMulti{chrono::steady_clock::now()};
-  bubbleSortMulti(*b);
-  const auto endBubbleMulti{chrono::steady_clock::now()};
-  *elapsedSecondsBubbleMulti = chrono::duration_cast<chrono::nanoseconds>(
-      endBubbleMulti - startBubbleMulti);
+  // });
 
-  t1.join();
-
-  std::cout << "Bubble Single\n";
-  // imprimirArray(*a);
-  std::cout << elapsedSecondsBubbleSingle->count() << "\n";
-  std::cout << "Bubble Multi\n";
-  // imprimirArray(*b);
-  std::cout << elapsedSecondsBubbleMulti->count() << "\n";
+  // t1.join();
 }
