@@ -1,45 +1,45 @@
 #pragma once
 #include <iostream>
+#include <utility>
 
 #include "types.hpp"
 
 template<typename T, usize N, usize M>
 struct Mat {
-	T data[N * M];
+	T* data;
 
-	constexpr
-	usize height() const { return N; }
+    constexpr
+    usize height() const { return N; }
 
-	constexpr
-	usize width() const { return M; }
+    constexpr
+    usize width() const { return M; }
 
-	// constexpr
-	// Row row(usize idx) const {
-	// 	Row r;
-	// 	for(usize i = 0; i < M; i += 1){
-	// 		r[i] = data[(idx * M) + i];
-	// 	}
-	// 	return r;
-	// }
+    constexpr
+    T& at(usize row, usize col){
+        return data[(row * M) + col];
+    }
 
-	// constexpr
-	// Col col(usize idx) const {
-	// 	Col c;
-	// 	for(usize i = 0; i < N; i += 1){
-	// 		c[i] = data[(i * M) + idx];
-	// 	}
-	// 	return c;
-	// }
+    constexpr
+    const T& at(usize row, usize col) const {
+        return data[(row * M) + col];
+    }
 
-	constexpr
-	T& at(usize row, usize col){
-		return data[(row * M) + col];
+	Mat(){
+        data = new T[N * M];
+    }
+
+	Mat(Mat&& m){
+		data = std::exchange(m.data, nullptr);
 	}
 
-	constexpr
-	const T& at(usize row, usize col) const {
-		return data[(row * M) + col];
+	void operator=(Mat&& m){
+		delete[] data;
+		data = std::exchange(m.data, nullptr);
 	}
+
+    ~Mat(){
+        delete[] data;
+    }
 };
 
 template<usize N>
