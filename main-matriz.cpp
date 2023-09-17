@@ -10,7 +10,8 @@
 
 namespace chrono = std::chrono;
 
-template <usize N> void preencherMatriz(Matriz<N> &m){
+template <usize N> 
+void preencherMatriz(Matriz<N> &m){
   auto rd = std::random_device{};
   auto randDev = std::mt19937(rd()); // de onde ele pega o numero
   auto dist = std::uniform_real_distribution<>(-5.0, 5.0); // especialização dum gerador de distribuição uniforme
@@ -53,14 +54,14 @@ Matriz<N> matMultiThr(Matriz<N> const &a, Matriz<N> const &b) {
 
   auto p1 = std::thread([&]() {
     for(usize li = 0; li < meio; li++){
-        for(usize col = 0; col < meio; col++){
+        for(usize col = 0; col < N; col++){
             res.at(li, col) = a.at(li, col) * b.at(col, li);
         }
     }
   });
 
   for(usize li = meio; li < N; li++){
-      for(usize col = meio; col < N; col++){
+      for(usize col = 0; col < N; col++){
           res.at(li, col) = a.at(li, col) * b.at(col, li);
       }
   }
@@ -77,9 +78,13 @@ int main() {
   // botado no heap
   auto a = std::make_unique<Matriz<M>>();
   auto b = std::make_unique<Matriz<M>>();
+  // auto c = std::make_unique<Matriz<M>>();
+  // auto d = std::make_unique<Matriz<M>>();
 
   preencherMatriz(*a);
   preencherMatriz(*b);
+  // preencherMatriz(*c);
+  // preencherMatriz(*d);
 
   auto multiPosSingle = std::make_unique<Matriz<M>>();
   auto multiPosMulti = std::make_unique<Matriz<M>>(); // se mata no final do escopo
@@ -122,20 +127,20 @@ int main() {
 
 
   std::cout << "Posicional Sigle\n";
-  imprimeMatriz(*multiPosSingle);
+  // imprimeMatriz(*multiPosSingle);
   std::cout << elapsedSecondsPosSingle->count() << "\n";
 
   std::cout << "Posicional Multi\n";
-  imprimeMatriz(*multiPosMulti);
+  // imprimeMatriz(*multiPosMulti);
   std::cout << elapsedSecondsPosMulti->count() << "\n";
 
 
   std::cout << "Matricial Sigle\n";
-  imprimeMatriz(*multiMatSingle);
+  // imprimeMatriz(*multiMatSingle);
   std::cout << elapsedSecondsMatSingle->count() << "\n";
 
   std::cout << "Matricial Multi\n";
-  imprimeMatriz(*multiMatMulti);
+  // imprimeMatriz(*multiMatMulti);
   std::cout << elapsedSecondsMatMulti->count() << "\n";
 
   return 0;
